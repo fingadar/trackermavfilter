@@ -76,46 +76,69 @@ read_messages()
 	while ( !time_to_exit )
 	{
 		mavlink_message_t message;
+		mavlink_message_t out_message;
 		success = source_port->read_message(message);
 		if( success )
 		{
 			
-			mavlink_status_t* chan_state = mavlink_get_channel_status(MAVLINK_COMM_0);
+			mavlink_status_t* chan_state = mavlink_get_channel_status(MAVLINK_COMM_1);
 			chan_state->flags |= MAVLINK_STATUS_FLAG_OUT_MAVLINK1;
 
-//			message.magic = MAVLINK_STX_MAVLINK1;
 			switch (message.msgid)
 			{
 
 				case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
 				{
-//					printf("MAVLINK_MSG_ID_GLOBAL_POSITION_INT\n");
-					dest_port->write_message(message);
+					mavlink_global_position_int_t mavlink_global_position_int;
+					mavlink_msg_global_position_int_decode (&message, &mavlink_global_position_int);
+					mavlink_msg_global_position_int_encode_chan (mysystemid, mycomponentid, MAVLINK_COMM_1, &out_message, &mavlink_global_position_int);			
+ 					dest_port->write_message(out_message);
 					break;
 				}
 
 				case MAVLINK_MSG_ID_GPS_RAW_INT:
 				{
-//					printf("MAVLINK_MSG_ID_GPS_RAW_INT\n");
-					dest_port->write_message(message);
+					mavlink_gps_raw_int_t mavlink_gps_raw_int;
+					mavlink_msg_gps_raw_int_decode (&message, &mavlink_gps_raw_int);
+					mavlink_msg_gps_raw_int_encode_chan (mysystemid, mycomponentid, MAVLINK_COMM_1, &out_message, &mavlink_gps_raw_int);
+					dest_port->write_message(out_message);
 					break;
 				}
 
 				case MAVLINK_MSG_ID_ATTITUDE:
 				{
-//					printf("MAVLINK_MSG_ID_ATTITUDE\n");
-					dest_port->write_message(message);
+					mavlink_attitude_t mavlink_attitude;
+					mavlink_msg_attitude_decode (&message, &mavlink_attitude);
+					mavlink_msg_attitude_encode_chan (mysystemid, mycomponentid, MAVLINK_COMM_1, &out_message, &mavlink_attitude);
+					dest_port->write_message(out_message);
 					break;
 				}
 
 				case MAVLINK_MSG_ID_HEARTBEAT:
 				{
-					get_own_ip();
-					string my_out_string = "TESTZEILE mit 20 Z.." + my_own_ip;
-//					const char *cstr = "TESTZEILE mit 20 Z.." + my_own_ip.c_str();
-					const char *cstr =my_out_string.c_str();
-					mavlink_msg_statustext_pack (0, 0, &message, 1, cstr);
-					dest_port->write_message(message);
+					mavlink_heartbeat_t mavlink_heartbeat;
+					mavlink_msg_heartbeat_decode (&message, &mavlink_heartbeat);
+					mavlink_msg_heartbeat_encode_chan (mysystemid, mycomponentid, MAVLINK_COMM_1, &out_message, &mavlink_heartbeat);
+					dest_port->write_message(out_message);
+					break;
+				}
+
+				case MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN:
+				{
+					mavlink_gps_global_origin_t mavlink_gps_global_origin;
+					mavlink_msg_gps_global_origin_decode (&message, &mavlink_gps_global_origin);
+					mavlink_msg_gps_global_origin_encode_chan (mysystemid, mycomponentid, MAVLINK_COMM_1, &out_message, &mavlink_gps_global_origin);
+					dest_port->write_message(out_message);
+					break;
+				}
+
+				case MAVLINK_MSG_ID_VFR_HUD:
+				{
+					mavlink_vfr_hud_t mavlink_vfr_hud;
+					mavlink_msg_vfr_hud_decode (&message, &mavlink_vfr_hud);
+					mavlink_msg_vfr_hud_encode_chan (mysystemid, mycomponentid, MAVLINK_COMM_1, &out_message, &mavlink_vfr_hud);
+					dest_port->write_message(out_message);
+					break;
 				}
 
 				default:

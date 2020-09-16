@@ -75,6 +75,9 @@
 #include <common/mavlink.h>
 using namespace std;
 
+#define mysystemid 100
+#define mycomponentid 200
+
 // helper functions
 
 void* start_TrackerFilter_interface_read_thread(void *args);
